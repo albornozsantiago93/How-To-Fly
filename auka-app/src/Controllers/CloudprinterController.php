@@ -1,38 +1,81 @@
 <?php
-
 namespace Controllers;
 
-use Models\OrderData;
+use Models\CloudprinterOrderData;
+use GuzzleHttp\Client;
 
 class CloudprinterController
 {
-    private $cloudprinterConfig;
+    private $client;
+    private $apiKey;
 
     public function __construct()
     {
-        $this->cloudprinterConfig = require __DIR__ . '/../Config/cloudprinter.php';
-    }
+        $config = require __DIR__ . '/../config/cloudprinter.php';
+        $this->client = new Client(['base_uri' => 'https://api.cloudprinter.com/cloudcore/1.0/']);
+        $this->apiKey = $config['api_key'];
 
-    public function createOrder(OrderData $order)
+    }
+    
+    public function handleWebhook(array $data)
     {
-        $url = "{$this->cloudprinterConfig['api_url']}/orders";
-        $headers = [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $this->cloudprinterConfig['api_key'],
-        ];
+        $eventType = $data['type'] ?? '';
 
-        $data = json_encode($order);
+        switch ($eventType) {
+            case 'ItemProduce':
+                $this->handleOrderShipped($data);
+                break;
 
-        // Inicializar cURL para la solicitud
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            case 'ItemShipped':
+                $this->handleOrderShipped($data);
+                break;
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+                
+            default:
+                // Log event no reconocido
+                $this->handleOrderFailed($data);
+                break;
+        }
 
-        return json_decode($response, true);
+        return ['status' => 'Event processed'];
     }
+
+    
+    
+    private function createOrder(CloudprinterOrderData $orderData)
+    {
+        $response = $this->client->post('orders/add', [
+            'json' => [
+                'apikey' => $this->apiKey,
+                'reference' => $orderData->reference,
+                'email' => $orderData->email,
+                'addresses' => $orderData->addresses,
+                'items' => $orderData->items
+            ]
+        ]);
+
+        return json_decode($response->getBody(), true);
+    }
+    
+
+    private function handleOrderStatusUpdate(array $data)
+    {
+        // Lógica para procesar la actualización de estado de un pedido
+        // Puedes acceder a detalles específicos de $data y procesarlos
+        // Ejemplo: actualizar base de datos o enviar notificaciones
+    }
+
+    private function handleOrderShipped(array $data)
+    {
+        // Lógica para manejar cuando un pedido ha sido enviado
+        // Procesa detalles de $data como tracking y actualiza tu sistema
+    }
+
+    private function handleOrderFailed(array $data)
+    {
+        // Lógica para manejar fallos en pedidos
+        // Registra el error y toma las acciones correspondientes
+    }
+
+
 }

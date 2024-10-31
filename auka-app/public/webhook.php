@@ -1,31 +1,19 @@
 <?php
-require_once __DIR__ . '/../src/Controllers/ShopifyController.php';
 
-$shopifyController = new Controllers\ShopifyController();
 
-// Lee los datos del webhook
-$webhookData = file_get_contents('php://input');
-$data = json_decode($webhookData, true);
+use Shopify\Webhooks\Registry;
 
-// Lee el tipo de evento desde el encabezado
-$eventType = $_SERVER['HTTP_X_SHOPIFY_TOPIC'] ?? '';
+try {
+    $response = Registry::process($_SERVER, file_get_contents('php://input'));
 
-switch ($eventType) 
-{
-    case 'orders/create':
-        $shopifyController->handleOrderCreation($data);
-        break;
-
-    case 'fulfillments/update':
-        $shopifyController->handleOrderUpdate($data);
-        break;
-
-    default:
+    if ($response->isSuccess()) {
+        http_response_code(200);
+        echo json_encode(['status' => 'Webhook processed successfully']);
+    } else {
         http_response_code(400);
-        echo json_encode(['error' => 'Evento no manejado']);
-        exit();
+        echo json_encode(['error' => $response->getErrorMessage()]);
+    }
+} catch (\Exception $error) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Invalid webhook request: ' . $error->getMessage()]);
 }
-
-http_response_code(200);
-echo json_encode(['status' => 'Webhook procesado correctamente']);
-?>
