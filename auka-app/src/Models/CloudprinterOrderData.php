@@ -38,6 +38,10 @@ class CloudprinterOrderData {
     private function mapItems($lineItems) {
         $items = [];
         foreach ($lineItems as $item) {
+            $coverUrl = $item['cover_url'] ?? null;
+            $bookUrl = $item['book_url'] ?? null;
+            $page_count = $item['page_count'] ?? 324;
+    
             $items[] = [
                 "reference" => $item['id'],
                 "product" => $item['sku'],  // Ajustar según el SKU necesario en Cloudprinter
@@ -47,24 +51,25 @@ class CloudprinterOrderData {
                 "files" => [
                     [
                         "type" => "cover",
-                        "url" => $item['cover_url'],  // Cambia esto por la URL real
-                        "md5sum" => md5_file($item['cover_url'])
+                        "url" => $coverUrl,
+                        "md5sum" => $coverUrl ? md5_file($coverUrl) : null
                     ],
                     [
                         "type" => "book",
-                        "url" => $item['book_url'],  // Cambia esto por la URL real
-                        "md5sum" => md5_file($item['book_url'])
+                        "url" => $bookUrl,
+                        "md5sum" => $bookUrl ? md5_file($bookUrl) : null
                     ]
                 ],
                 "options" => [
                     [
                         "type" => "total_pages",
-                        "count" => $item['page_count'] // Ajusta según las páginas necesarias
+                        "count" => $page_count
                     ]
                 ]
             ];
         }
         return $items;
     }
+    
     
 }

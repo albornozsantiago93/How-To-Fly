@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'albor/auka-app',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '46acf3f81e65e0d260affe260860bf71c161a35a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'albor/auka-app' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '46acf3f81e65e0d260affe260860bf71c161a35a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -161,9 +161,9 @@
             ),
         ),
         'shopify/shopify-api' => array(
-            'pretty_version' => 'v5.6.0',
-            'version' => '5.6.0.0',
-            'reference' => 'fcb281a0021453659c3e4f09320417b264c35ee8',
+            'pretty_version' => 'v5.7.0',
+            'version' => '5.7.0.0',
+            'reference' => '5e390f1c0715fed73d8b8aab8fd7b08fdb417baf',
             'type' => 'library',
             'install_path' => __DIR__ . '/../shopify/shopify-api',
             'aliases' => array(),

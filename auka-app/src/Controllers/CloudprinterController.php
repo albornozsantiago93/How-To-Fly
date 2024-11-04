@@ -21,20 +21,21 @@ class CloudprinterController
     {
         $eventType = $data['type'] ?? '';
 
-        switch ($eventType) {
+        switch ($eventType) 
+        {
             case 'ItemProduce':
                 $this->handleOrderShipped($data);
-                break;
+            break;
 
             case 'ItemShipped':
                 $this->handleOrderShipped($data);
-                break;
+            break;
 
                 
             default:
                 // Log event no reconocido
                 $this->handleOrderFailed($data);
-                break;
+            break;
         }
 
         return ['status' => 'Event processed'];
@@ -42,7 +43,7 @@ class CloudprinterController
 
     
     
-    private function createOrder(CloudprinterOrderData $orderData)
+    public function createOrder(CloudprinterOrderData $orderData)
     {
         $response = $this->client->post('orders/add', [
             'json' => [

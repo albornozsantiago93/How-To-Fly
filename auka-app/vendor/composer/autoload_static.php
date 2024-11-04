@@ -29,6 +29,10 @@ class ComposerStaticInitdde2cc583f0823225bbd40f9b2762cbc
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
         ),
+        'M' => 
+        array (
+            'Models\\' => 7,
+        ),
         'G' => 
         array (
             'GuzzleHttp\\Psr7\\' => 16,
@@ -49,6 +53,7 @@ class ComposerStaticInitdde2cc583f0823225bbd40f9b2762cbc
         ),
         'A' => 
         array (
+            'App\\' => 4,
             'Albor\\AukaApp\\' => 14,
         ),
     );
@@ -79,6 +84,10 @@ class ComposerStaticInitdde2cc583f0823225bbd40f9b2762cbc
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
+        'Models\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src/Models',
+        ),
         'GuzzleHttp\\Psr7\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
@@ -102,6 +111,10 @@ class ComposerStaticInitdde2cc583f0823225bbd40f9b2762cbc
         'Brick\\Math\\' => 
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
+        ),
+        'App\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
         ),
         'Albor\\AukaApp\\' => 
         array (
