@@ -12,7 +12,7 @@ class CloudprinterOrderData {
         $this->reference = $shopifyOrder->id;
         $this->email = $shopifyOrder->email;
         $this->addresses = $this->mapAddress($shopifyOrder);
-        $this->items = $this->mapItems($shopifyOrder->line_items);
+        $this->items = isset($shopifyOrder->line_items) ? $this->mapItems($shopifyOrder->line_items) : [];
     }
 
     private function mapAddress($shopifyOrder) {
@@ -41,7 +41,7 @@ class CloudprinterOrderData {
             $coverUrl = $item['cover_url'] ?? null;
             $bookUrl = $item['book_url'] ?? null;
             $page_count = $item['page_count'] ?? 324;
-    
+
             $items[] = [
                 "reference" => $item['id'],
                 "product" => $item['sku'],  // Ajustar según el SKU necesario en Cloudprinter
@@ -69,6 +69,7 @@ class CloudprinterOrderData {
             ];
         }
         return $items;
+    
     }
     
     

@@ -11,10 +11,10 @@ use Controllers\ShopifyController;
         $topic = $_SERVER['HTTP_X_SHOPIFY_TOPIC'];
 
         // Clave secreta de la API de Shopify
-        $secret = 'UpjYFvSqb7JlhILNX8sJkUDh7kxnGmUaNnlW2vnRABs=';
+        //$secret = 'UpjYFvSqb7JlhILNX8sJkUDh7kxnGmUaNnlW2vnRABs=';
 
         // Calcula la firma HMAC
-        $calculatedHmac = base64_encode(hash_hmac('sha256', $body, $secret, true));
+        //$calculatedHmac = base64_encode(hash_hmac('sha256', $body, $secret, true));
 
         // Verifica que las firmas coincidan
 
@@ -24,7 +24,7 @@ use Controllers\ShopifyController;
         //     exit;
         // }
 
-        $response = true; // Registry::process($_SERVER, $body);
+        $response = true; //Registry::process($_SERVER, $body);
 
         if ($response) //->isSuccess()
         {
@@ -36,16 +36,30 @@ use Controllers\ShopifyController;
                     echo json_encode(['status' => 'OrderCreate']);
                     $shopifyController->handleOrderCreation(json_decode($body, true));
                 break;
+
+
+                case 'orders/updated':
+                    echo json_encode(['status' => 'OrderUpdated']);
+                    //$shopifyController->handleOrderUpdate($webhookData);
+                break;
+
+
+                case 'orders/fulfilled':
+                    echo json_encode(['status' => 'OrderFulfilled']);
+                    //$shopifyController->handleOrderFulfillment($webhookData);
+                break;
+
                 
                 case 'fulfillments/update':
                     echo json_encode(['status' => 'FullfillmentUpdate']);
                     $fulfillmentData = json_decode($body, true);
-                    $shopifyController->updateFulfillmentTracking($fulfillmentData['fulfillment']['id'], [
-                        'tracking_number' => $fulfillmentData['fulfillment']['tracking_number'],
-                        'tracking_urls' => $fulfillmentData['fulfillment']['tracking_urls'],
+                    $shopifyController->updateFulfillmentTracking($fulfillmentData['fulfillment']['id'] ?? null, [
+                        'tracking_number' => $fulfillmentData['fulfillment']['tracking_number'] ?? null,
+                        'tracking_urls' => $fulfillmentData['fulfillment']['tracking_urls'] ?? null,
                         'notify_customer' => true
                     ]);
                 break;
+                
                 
                 default:
                     throw new \Exception("Unhandled webhook topic: $topic");

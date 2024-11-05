@@ -28,6 +28,7 @@ class ComposerStaticInitdde2cc583f0823225bbd40f9b2762cbc
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
+            'Particle\\Validator\\' => 19,
         ),
         'M' => 
         array (
@@ -46,6 +47,11 @@ class ComposerStaticInitdde2cc583f0823225bbd40f9b2762cbc
         'D' => 
         array (
             'Doctrine\\Inflector\\' => 19,
+        ),
+        'C' => 
+        array (
+            'Cloudprinter\\CloudCore\\' => 23,
+            'CloudPrinter\\CloudCore\\' => 23,
         ),
         'B' => 
         array (
@@ -84,6 +90,10 @@ class ComposerStaticInitdde2cc583f0823225bbd40f9b2762cbc
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
+        'Particle\\Validator\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/particle/validator/src',
+        ),
         'Models\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/Models',
@@ -107,6 +117,14 @@ class ComposerStaticInitdde2cc583f0823225bbd40f9b2762cbc
         'Doctrine\\Inflector\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/inflector/lib/Doctrine/Inflector',
+        ),
+        'Cloudprinter\\CloudCore\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cloudprinter/cloudcore/src',
+        ),
+        'CloudPrinter\\CloudCore\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cloudprinter/cloudcore/src',
         ),
         'Brick\\Math\\' => 
         array (

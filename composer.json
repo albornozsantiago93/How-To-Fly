@@ -1,0 +1,5 @@
+{
+    "require": {
+        "cloudprinter/cloudcore": "^1.0"
+    }
+}
