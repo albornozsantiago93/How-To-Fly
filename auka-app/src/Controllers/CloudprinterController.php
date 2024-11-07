@@ -26,6 +26,14 @@ class CloudprinterController
 
     public function createOrder(CloudprinterOrderData $orderData)
     {
+        $orderPayload= [
+            'apikey' => $this->apiKey,
+            'reference' => $orderData->reference,
+            'email' => $orderData->email,
+            'addresses' => $orderData->addresses,
+            'items' => $orderData->items,
+        ];
+
         $order = new Order();
         $order->setReference($orderData->reference)
             ->setEmail($orderData->email);

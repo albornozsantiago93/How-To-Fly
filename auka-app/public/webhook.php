@@ -5,29 +5,30 @@ use Controllers\ShopifyController;
 
     try 
     {
-        // Obtén el cuerpo de la solicitud
+        //Obtén el cuerpo de la solicitud
         $body = file_get_contents('php://input');
-        $hmacHeader = $_SERVER['HTTP_X_SHOPIFY_HMAC_SHA256'] ?? '';
-        $topic = $_SERVER['HTTP_X_SHOPIFY_TOPIC'];
 
-        // Clave secreta de la API de Shopify
-        //$secret = 'UpjYFvSqb7JlhILNX8sJkUDh7kxnGmUaNnlW2vnRABs=';
+                    // $config = require __DIR__ . '/../src/Config/shopify.php';
+                    // $secret = $config['webhook_code'];
 
-        // Calcula la firma HMAC
-        //$calculatedHmac = base64_encode(hash_hmac('sha256', $body, $secret, true));
+        
+                    // $headers = [
+                    //     'X-Shopify-Hmac-Sha256' => $_SERVER['HTTP_X_SHOPIFY_HMAC_SHA256'] ?? '',
+                    //     'X-Shopify-Topic' => $_SERVER['HTTP_X_SHOPIFY_TOPIC'] ?? '',
+                    //     'X-Shopify-Shop-Domain' => $_SERVER['HTTP_X_SHOPIFY_SHOP_DOMAIN'] ?? '',
+                    // ];
+                
+                    // $calculatedHmac = base64_encode(hash_hmac('sha256', $body, $secret, true));
+                
+                    // if (!hash_equals($headers['X-Shopify-Hmac-Sha256'], $calculatedHmac)) {
+                    //     throw new \Exception("Invalid HMAC signature");
+                    // }
 
-        // Verifica que las firmas coincidan
-
-        // if (!hash_equals($hmacHeader, $calculatedHmac)) {
-        //     http_response_code(403);
-        //     echo json_encode(['error' => 'Invalid HMAC signature']);
-        //     exit;
-        // }
-
-        $response = true; //Registry::process($_SERVER, $body);
-
-        if ($response) //->isSuccess()
+        $response = Registry::process($_SERVER, $body);
+        
+        if ($response->isSuccess()) 
         {
+            $topic = $_SERVER['HTTP_X_SHOPIFY_TOPIC'];
             $shopifyController = new ShopifyController();
 
             switch ($topic) 
@@ -66,12 +67,12 @@ use Controllers\ShopifyController;
                 break;
             }
             http_response_code(200);
-            echo json_encode(['status' => 'Webhook processed successfully']);
         }
     } 
     catch (\Exception $error) 
     {
         http_response_code(403);
-        echo json_encode(['error' => 'Invalid webhook request: ' . $error->getMessage()]);
+        echo json_encode(['error' => 'Invalid webhook request: ' . $error->getMessage() ]);
+        //echo json_encode(['error' => $headers]);
     }
 ?>

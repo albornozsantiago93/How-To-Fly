@@ -17,8 +17,10 @@ class ShopifyController
 
     public function __construct()
     {
-        $config = require __DIR__ . '/../Config/shopify.php';
-        $path = __DIR__ . '/../storage/sessions'; // Define el path correcto para el almacenamiento de sesiones
+        $config = require __DIR__ . '/../../src/Config/shopify.php';
+        //$path = __DIR__ . '/../storage/sessions'; // Define el path correcto para el almacenamiento de sesiones
+        $path = 'C:/xampp/htdocs/Auka/auka-app/storage/sessions';
+
         $dbConfig = require __DIR__ . '/../Config/database.php'; // Archivo de configuración de la base de datos
 
             try 
@@ -60,7 +62,6 @@ class ShopifyController
         $cloudprinterResponse = null;
 
         try {
-
             $cloudprinterOrderData = new CloudprinterOrderData($shopifyOrder);
             $cloudprinterResponse = $this->cloudprinterController->createOrder($cloudprinterOrderData);
             
@@ -68,20 +69,13 @@ class ShopifyController
                 'status' => 'Order created successfully in Shopify and sent to Cloudprinter',
                 'cloudprinter_response' => $cloudprinterResponse
             ]);
-        } 
-        catch (\Exception $e) 
-        {
+        } catch (\Exception $e) {
             return json_encode(['error' => 'Error creating order: ' . $e->getMessage()]);
-        }
-        finally 
-        {
+        } finally {
             $this->saveOrderRecords($shopifyOrder, $cloudprinterResponse, 'POST');
         }
     }
-    
-    //finally dejar registro agregar estado
-    //mappear estados internos entre clod y shop
-    //guardo json que envio y recibo
+
 
     //UPDATE TRACKING
     public function updateFulfillmentTracking($fulfillmentId, $trackingData)
