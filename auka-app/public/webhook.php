@@ -24,9 +24,11 @@ use Controllers\ShopifyController;
                     //     throw new \Exception("Invalid HMAC signature");
                     // }
 
-        $response = Registry::process($_SERVER, $body);
-        
-        if ($response->isSuccess()) 
+        //$response = Registry::process($_SERVER, $body);
+        $response =true;
+
+        if ($response)//->isSuccess() 
+        //if ($response->isSuccess())
         {
             $topic = $_SERVER['HTTP_X_SHOPIFY_TOPIC'];
             $shopifyController = new ShopifyController();

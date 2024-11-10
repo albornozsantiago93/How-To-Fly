@@ -16,41 +16,43 @@ class CloudprinterOrderData
     public $addresses;
     public $files;
     public $items;
-    public $email; // Nueva propiedad para almacenar el email
+    public $email; 
+    public $reference;
 
     public function __construct($shopifyOrder)
     {
         $config = require __DIR__ . '/../Config/shopify.php';
-        $this->apikey = $config['cloudprinter_api_key']; // Asume que tienes una clave API configurada
+        $this->apikey = $config['cloudprinter_api_key'] ?? ''; // Verificar que la clave esté definida
         $this->id = (string) $shopifyOrder->id;
-        $this->date = $shopifyOrder->created_at;
-        $this->priority = "2"; // Prioridad fija; puedes ajustar según sea necesario
+        $this->date = $shopifyOrder->created_at ?? '';
+        $this->priority = "2"; // Valor fijo, ajusta según sea necesario
         $this->shipping_date = $shopifyOrder->processed_at ?? $shopifyOrder->created_at;
-        $this->email = $shopifyOrder->email; // Asignar el email desde el pedido de Shopify
+        $this->email = $shopifyOrder->email ?? '';
+        $this->reference = $shopifyOrder->reference ?? (string) $shopifyOrder->id; // Asignar referencia
 
         // Datos del creador
         $this->creator = [
             "id" => 1,
             "name" => "Cloudprinter.com",
             "version" => "2.1",
-            "date" => $shopifyOrder->created_at,
+            "date" => $shopifyOrder->created_at ?? '',
         ];
 
         // Cliente
         $this->client = [
             "id" => 1,
             "name" => "Cloudprinter.com",
-            "date" => $shopifyOrder->created_at,
-            "reference" => $shopifyOrder->reference ?? '',
+            "date" => $shopifyOrder->created_at ?? '',
+            "reference" => $this->reference,
         ];
 
         // Costos
         $this->costs = [
-            "currency" => $shopifyOrder->currency,
-            "shipping" => $shopifyOrder->total_shipping_price_set['shop_money']['amount'],
-            "items" => $shopifyOrder->current_subtotal_price,
-            "vat" => "0.0000", // Asumiendo VAT en 0; puedes ajustar según sea necesario
-            "total" => $shopifyOrder->total_price,
+            "currency" => $shopifyOrder->currency ?? '',
+            "shipping" => $shopifyOrder->current_shipping_price_set['shop_money']['amount'] ?? '0.00',
+            "items" => $shopifyOrder->current_subtotal_price ?? '0.00',
+            "vat" => "0.0000", // Asume VAT en 0; ajusta si es necesario
+            "total" => $shopifyOrder->total_price ?? '0.00',
         ];
 
         // Detalles de envío
@@ -59,37 +61,36 @@ class CloudprinterOrderData
             "consignor" => "The Book Company",
             "invoice" => [
                 "shipments" => 1,
-                "currency" => $shopifyOrder->currency,
-                "total" => $shopifyOrder->total_shipping_price_set['shop_money']['amount'],
+                "currency" => $shopifyOrder->currency ?? '',
+                "total" => $shopifyOrder->current_shipping_price_set['shop_money']['amount'] ?? '0.00',
             ],
             "proforma_invoice" => [
-                "currency" => $shopifyOrder->currency,
-                "total" => $shopifyOrder->total_price,
-                "weight" => "173.6986", // Peso fijo; puede ajustarse
+                "currency" => $shopifyOrder->currency ?? '',
+                "total" => $shopifyOrder->total_price ?? '0.00',
+                "weight" => "173.6986", // Peso fijo; ajusta si es necesario
             ],
         ];
 
         $this->addresses = $this->mapAddress($shopifyOrder);
-        $this->files = $this->mapFiles($shopifyOrder->line_items);
-        $this->items = $this->mapItems($shopifyOrder->line_items);
+        $this->files = $this->mapFiles($shopifyOrder->line_items ?? []);
+        $this->items = $this->mapItems($shopifyOrder->line_items ?? []);
     }
 
     private function mapAddress($shopifyOrder)
     {
-        $address = $shopifyOrder->shipping_address;
+        $address = $shopifyOrder->shipping_address ?? [];
         return [[
             "type" => "delivery",
             "company" => $address['company'] ?? '',
-            "name" => $address['first_name'] . ' ' . $address['last_name'],
-            "street1" => $address['address1'],
+            "name" => ($address['first_name'] ?? '') . ' ' . ($address['last_name'] ?? ''),
+            "street1" => $address['address1'] ?? '',
             "street2" => $address['address2'] ?? '',
-            "zip" => $address['zip'],
-            "city" => $address['city'],
-            "country" => $address['country_code'],
+            "zip" => $address['zip'] ?? '',
+            "city" => $address['city'] ?? '',
+            "country" => $address['country_code'] ?? '',
             "state" => $address['province_code'] ?? '',
-            "email" => $shopifyOrder->email,
+            "email" => $shopifyOrder->email ?? '',
             "phone" => $address['phone'] ?? '',
-            "customer identification" => ""
         ]];
     }
 
@@ -125,15 +126,15 @@ class CloudprinterOrderData
         foreach ($lineItems as $item) {
             $coverUrl = $item['cover_url'] ?? null;
             $bookUrl = $item['book_url'] ?? null;
-            $page_count = $item['page_count'] ?? 324; // Valor por defecto si no se proporciona
+            $page_count = $item['page_count'] ?? '44'; // Valor por defecto
 
             $items[] = [
                 "id" => (string) $item['id'],
-                "count" => $item['quantity'],
-                "title" => $item['title'],
-                "product" => $item['sku'],
+                "count" => $item['quantity'] ?? 1,
+                "title" => $item['title'] ?? '',
+                "product" => $item['sku'] ?? '',
                 "desc" => $item['name'] ?? '',
-                "pages" => (string) $page_count,
+                "pages" => $page_count,
                 "files" => [
                     [
                         "type" => "cover",
@@ -154,7 +155,7 @@ class CloudprinterOrderData
                     [
                         "option" => "pageblock_80off",
                         "desc" => "Pageblock paper 80gsm Offset",
-                        "count" => (string) $page_count,
+                        "count" => $page_count,
                         "type" => "type_main_paper"
                     ],
                     [
@@ -163,11 +164,7 @@ class CloudprinterOrderData
                         "count" => "1",
                         "type" => "type_book_cover_finish"
                     ]
-                ],
-                "reorder_desc" => "damaged parcel",
-                "reorder_order_id" => "1046305470000", // Ajustar según necesidad
-                "reorder_item_id" => "1046305470002", // Ajustar según necesidad
-                "reorder_cause" => "reorder_shipping_item_damaged"
+                ]
             ];
         }
         return $items;

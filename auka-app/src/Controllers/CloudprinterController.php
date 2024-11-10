@@ -7,6 +7,8 @@ use CloudPrinter\CloudCore\Client\CloudCoreClient;
 use CloudPrinter\CloudCore\Model\Order;
 use CloudPrinter\CloudCore\Model\Address;
 use CloudPrinter\CloudCore\Model\OrderItem;
+use CloudPrinter\CloudCore\Model\File;
+use CloudPrinter\CloudCore\Model\Option;
 
 
 
@@ -26,14 +28,7 @@ class CloudprinterController
 
     public function createOrder(CloudprinterOrderData $orderData)
     {
-        $orderPayload= [
-            'apikey' => $this->apiKey,
-            'reference' => $orderData->reference,
-            'email' => $orderData->email,
-            'addresses' => $orderData->addresses,
-            'items' => $orderData->items,
-        ];
-
+        // Configurar el objeto Order
         $order = new Order();
         $order->setReference($orderData->reference)
             ->setEmail($orderData->email);
@@ -41,29 +36,65 @@ class CloudprinterController
         // Agregar direcciones
         foreach ($orderData->addresses as $addressData) {
             $address = new Address();
-            $address->setFirstname($addressData['firstname'])
-                    ->setLastname($addressData['lastname'])
-                    ->setStreet($addressData['street1'])
-                    ->setCity($addressData['city'])
-                    ->setCountry($addressData['country']);
+            $address->setType($addressData['type'] ?? 'delivery')
+                    ->setCompany($addressData['company'] ?? '')
+                    ->setFirstName(($addressData['firstname'] ?? '') . ' ' . ($addressData['lastname'] ?? ''))
+                    ->setStreet($addressData['street1'] ?? '')
+                    ->setStreet($addressData['street2'] ?? '')
+                    ->setZip($addressData['zip'] ?? '')
+                    ->setCity($addressData['city'] ?? '')
+                    ->setCountry($addressData['country'] ?? '')
+                    ->setEmail($addressData['email'] ?? '')
+                    ->setPhone($addressData['phone'] ?? '');
             $order->addAddress($address);
         }
 
-        // Agregar ítems
+        // Agregar archivos
+        foreach ($orderData->files as $fileData) {
+            $file = new File();
+            $file->setType($fileData['type'] ?? 'unknown')
+                ->setUrl($fileData['url'] ?? '')
+                ->setMd5sum($fileData['md5sum'] ?? md5($fileData['url'] ?? ''));
+            $order->addFile($file);
+        }
+
+        // Agregar items
         foreach ($orderData->items as $itemData) {
             $item = new OrderItem();
-            $item->setReference($itemData['reference'])
-                ->setProduct($itemData['product'])
-                ->setCount($itemData['count']);
+            $item->setReference($itemData['id'] ?? '')
+                ->setProduct($itemData['product'] ?? '')
+                ->setCount($itemData['count'] ?? 1)
+                ->setTitle($itemData['title'] ?? '');
+                //->setDesc($itemData['desc'] ?? '')
+                //->setPages($itemData['pages'] ?? 1);
+
+            // Agregar archivos de cada item
+            foreach ($itemData['files'] as $fileData) {
+                $file = new File();
+                $file->setType($fileData['type'] ?? 'unknown')
+                    ->setUrl($fileData['url'] ?? '')
+                    ->setMd5sum($fileData['md5sum'] ?? md5($fileData['url'] ?? ''));
+                $item->addFile($file);
+            }
+
+            // Agregar opciones de cada item
+            foreach ($itemData['options'] as $optionData) {
+                $option = new Option();
+                $option->setType($optionData['type'] ?? 'default')
+                    ->setCount($optionData['count'] ?? 1);
+                $item->addOption($option);
+            }
+
             $order->addItem($item);
         }
 
+        // Llamada al cliente de CloudPrinter
         $response = $this->cloudCoreClient->order->create($order);
 
         if ($response) {
             return [
                 'status' => 'success',
-                'order_id' => $item->getReference()
+                'order_id' => $order->getReference()
             ];
         } else {
             return [
@@ -72,6 +103,7 @@ class CloudprinterController
             ];
         }
     }
+
 
     
     public function handleWebhook(array $data)
